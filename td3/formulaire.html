@@ -3,6 +3,7 @@
 <head>
     <title>Mon formulaire</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
@@ -12,7 +13,7 @@
         <form action="resultat.html" onsubmit="return validerFormulaire()" method="get" name="formule" id="formule">
             <div>
                 <label for="genre">Civilite :</label>
-                <select name="genre" id="genre" onchange="">
+                <select name="genre" id="genre" onchange="verifGenre()">
                     <option value="vide" selected></option>
                     <option value="m">M.</option>
                     <option value="mme">Mme</option>
@@ -23,51 +24,64 @@
             </div>
             <div>
                 <label for="nom">Nom :</label>
-                <input type="text" name="nom" id="nom" onkeyup="">
+                <input type="text" name="nom" id="nom" onkeyup="verifNom()">
                 <span id="champNom" class="test">Saisir un nom, entre 2 et 10 caracteres</span>
             </div>
             <div>
                 <label for="prenom">Prenom :</label>
-                <input type="text" name="prenom" id="prenom" onkeyup="">
+                <input type="text" name="prenom" id="prenom" onkeyup="verifPrenom()">
                 <span id="champPrenom" class="test">Saisir un prenom, entre 2 et 10 caracteres</span>
             </div>
             <div>
                 <label for="adresse">Adresse :</label>
-                <input type="text" name="adresse" id="adresse" onkeyup="">
+                <input type="text" name="adresse" id="adresse" onkeyup="verifAdresse()">
                 <span id="champAdresse" class="test">Saisir une adresse</span>
             </div>
             <div>
                 <label for="codePostal">Code postal :</label>
-                <input type="text" name="codePostal" id="codePostal" onkeyup="">
+                <input type="text" name="codePostal" id="codePostal" onkeyup="verifCodePostal()">
                 <span id="champCodePostal" class="test">Saisir un code postal valide</span>
             </div>
             <div>
                 <label for="ville">Ville :</label>
-                <input type="text" name="ville" id="ville" onkeyup="">
+                <input type="text" name="ville" id="ville" onkeyup="verifVille()">
                 <span id="champVille" class="test">La ville est obligatoire</span>
             </div>
             <div>
                 <label for="email">Email :</label>
-                <input type="email" name="email" id="email" onkeyup="" placeholder="moi@test.fr">
+                <input type="email" name="email" id="email" onkeyup="verifEmail()" placeholder="moi@test.fr">
                 <span id="champEmail" class="test">Saisir une adresse email valide</span>
             </div>
             <div>
                 <label for="telephone">Telephone :</label>
-                <input type="tel" name="telephone" id="telephone" onkeyup="" placeholder="01 23 45 67 89">
+                <input type="tel" name="telephone" id="telephone" onkeyup="verifTel()" placeholder="01 23 45 67 89">
                 <span id="champTel" class="test">Saisir un numéro de téléphone valide</span>
             </div>
 
             <hr>
             <div>
+                <div id="explication">
+                    <ul>
+                        <li><img id="case1" src="img/vide.png" height="21">
+                            Le mot de passe doit contenir des lettres et des chiffres</li>
+                        <li><img id="case2" src="img/vide.png" height="21">
+                            Le mot de passe doit contenir au moins un caractères spécial</li>
+                        <li><img id="case3" src="img/vide.png" height="21">
+                            Le mot de passe doit être compris entre 5 et 15 caractères</li>
+                    </ul>
+                </div>
+
                 <div>
                     <label for="mdp">Mot de passe :</label>
                     <input type="password" name="mdp" id="mdp"
-                           onkeyup="">
+                           onkeyup="verifMdp()"
+                           onfocus="document.getElementById('explication').style.display = 'block'"
+                           onblur="document.getElementById('explication').style.display = 'none'">
                     <span id="champMdp" class="test">Le mot de passe est trop faible.</span>
                 </div>
                 <div>
                     <label for="mdp2">Confirmer passe :</label>
-                    <input type="password" name="mdp2" id="mdp2" onkeyup="">
+                    <input type="password" name="mdp2" id="mdp2" onkeyup="verifMdp2()">
                     <span id="champMdp2" class="test"></span>
                 </div>
             </div>
