@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>JavaScript - TD4 - exo4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../lib/bootstrap.min.css">
+</head>
+
+<body>
+<div class="container">
+    <nav class="nav navbar">
+        <h2>Rechercher une ville</h2>
+    </nav>
+
+    <section>
+        <input id="ville" class="col-xs-12" list="liste-villes"
+               autocomplete="off" value="" placeholder="Rechercher une commune…">
+        <datalist id="liste-villes"></datalist>
+    </section>
+</div> <!-- fin .container -->
+
+<script>
+    const MAX = 10;
+    const baseUrl = 'https://geo.api.gouv.fr';
+
+    /**
+     * Appelée à chaque lettre tapée.
+     * Se charge de remplir la liste des villes en fonction du département sélectionné.
+     */
+    document.querySelector('#ville').onkeyup = function (event) {
+        const key = event.keyCode;
+        const nomSaisi = document.querySelector('#ville').value;
+
+        // si on appuie sur une fleche haut ou bas
+        if (key === 40 || key === 38) {
+            return;
+        }
+
+        fetch(baseUrl + '/communes?nom=' + nomSaisi + '&fields=departement')
+            .then(function (reponse) {
+                return reponse.json();
+            })
+            .then(function (json) {
+                let dataListe = document.querySelector("#liste-villes");
+                dataListe.innerHTML = '';
+
+                if (json.length > 0) {
+                    for (let i = 0; i < MAX && i < json.length; i++) {
+                        let ville = json[i];
+                        let departement = ville.departement != null ? '(' + ville.departement.nom + ' - ' + ville.departement.code + ')' : '';
+                        dataListe.innerHTML += `<option value="${ville.nom} ${departement}">`;
+                    }
+                }
+            })
+            .catch(function (erreur) {
+                alert('erreur : ' + erreur);
+            })
+            .finally(function () {
+                //cette fonction est toujours appelée
+            })
+    };
+</script>
+</body>
+</html>
