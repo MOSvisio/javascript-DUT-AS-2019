@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>test ajax avec javascript</title>
+</head>
+
+<body>
+    <button onclick="lancerRequeteAjax('test.html')">
+        Effectuer une requête Ajax
+    </button>
+
+    <script type="text/javascript" language="javascript">
+        /**
+         * Lance une requête AJAX.
+         *
+         * @param url la destination
+         */
+        function lancerRequeteAjax(url) {
+            fetch(url)
+                .then(function (reponse) {
+                    if (reponse.ok) {
+                        return reponse.text()
+                    } else {
+                        alert('Un problème est survenu avec la requête.');
+                    }
+                })
+                .then(function (html) {
+                    afficherResultat(html)
+                })
+                .catch(function (erreur) {
+                    alert('Abandon :( Erreur dans la requete AJAX : ' + erreur);
+                    return false;
+                });
+        }
+
+        /**
+         * Affiche le résultat de la requête dans un alert.
+         *
+         * @param texte le texte HTML
+         */
+        function afficherResultat(texte) {
+            alert(texte);
+        }
+    </script>
+</body>
+</html>
