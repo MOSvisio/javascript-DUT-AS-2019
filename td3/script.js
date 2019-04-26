@@ -1,6 +1,6 @@
 const regexNom = /^[a-zA-Z]{2,10}$/;
-const regexAdresse = /^[a-zA-Z]{5,100}$/;
-const regexVille = /^[a-zA-Z]{2,100}$/;
+const regexAdresse = /^[a-zA-Z]([-'\s]?[a-zA-Z]){4,99}$/;
+const regexVille = /^[a-zA-Z]([-'\s]?[a-zA-Z]){1,49}$/;
 const regexCodePostal = /^[0-9]{5}$/;
 const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const regexTelephone = /^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$/;
