@@ -1,0 +1,567 @@
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>TD5 - Angular</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    .fichier {
+      color: green
+    }
+
+    .dossier {
+      color: blueviolet
+    }
+  </style>
+</head>
+
+<body>
+<div id="main" class="container">
+  <div class="page-header text-center">
+    <h1>Tuto Angular 7</h1>
+  </div>
+
+  <section>
+    <h2>Préambule</h2>
+
+    <p>
+      <b>Angular</b> est un framework côté client basé sur <b>TypeScript</b>.
+    </p>
+
+    <p>
+      <b>TypeScript</b> est un language de programmation développé par <b>Microsoft</b>.
+      C'est une surcouche à <b>JavaScript</b>.
+    </p>
+  </section>
+
+
+  <section>
+    <h2 class="page-title">Créer le projet Angular</h2>
+
+    <p>
+      Ouvrir un terminal dans le dossier voulu et lancer la commande :
+      <code>ng new le-nom-de-votre-projet</code>
+    </p>
+
+    <p>
+      Ouvrir le projet avec votre IDE préféré. IntelliJ ou PhpStorm si possible.
+    </p>
+  </section>
+
+
+  <section>
+    <h2>Découverte du projet</h2>
+
+    Voici les dossiers du projet :
+    <ul class="dossier">
+      <li>e2e</li>
+      <li>node_modules</li>
+      <li>
+        src
+        <ul>
+          <li>app</li>
+          <li>assets</li>
+          <li>environnements</li>
+        </ul>
+      </li>
+    </ul>
+
+    Nous travaillerons uniquement dans le dossier <b>app</b>.
+  </section>
+
+
+  <section>
+    <h2>Lancer le client Angular</h2>
+
+    <p>
+      Dans le terminal, entrer dans le dossier du projet et lancer la commande :
+      <code>ng serve --open</code>
+    </p>
+
+    <p>
+      Par défaut, l'application tourne sur : <b>http://localhost:4200</b>
+    </p>
+  </section>
+
+
+  <section>
+    <h2>&Eacute;crire le modèle</h2>
+
+    <p>
+      Un étudiant se compose de son <b>prénom (string)</b> et de son <b>nom (string)</b>.
+      <br>
+      On ajoute également un <b>id</b>.
+    </p>
+    <p>
+      On va créer notre classe <b>Etudiant</b>.
+    </p>
+
+    <p>Lancer la commande :
+      <code>ng generate class modele/etudiant</code>
+    </p>
+
+    <p>Normalement un dossier <b>modele</b> a été créé.</p>
+
+    <div>
+      Ouvrir le fichier <b>modele/etudiant.ts</b> et le compléter comme suit :
+      <br>
+      <pre>
+        export class Etudiant &#123;
+          id: bigint;
+          nom: string;
+          prenom: string;
+        }
+      </pre>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Créer le service</h2>
+
+    <p>Le service se chargera de lancer les requêtes HTTP vers le serveur REST.</p>
+
+    <p>
+      Lancer la commande :
+      <code>ng generate service service/etudiant</code>
+    </p>
+
+    <p>Normalement un dossier <b>service</b> a été créé.</p>
+
+    <div>
+      Ouvrir le fichier <b>service/etudiant.service.ts</b> et le compléter comme suit :
+      <pre>
+        import &#123;Injectable} from '@angular/core';
+        import &#123;HttpClient, HttpHeaders} from '@angular/common/http';
+        import &#123;Observable, of} from 'rxjs';
+        import &#123;catchError, map, tap} from 'rxjs/operators';
+        import &#123;Etudiant} from '../modele/etudiant';
+
+        @Injectable(&#123;
+                providedIn: 'root'
+        })
+        export class EtudiantService &#123;
+          url = 'http://localhost:8080/etudiants';
+          httpOptions = &#123;
+            headers: new HttpHeaders(&#123;
+              'Content-Type': 'application/json'
+            })
+          };
+
+          constructor(private http: HttpClient) &#123;
+          }
+
+          private extraireData(res: Response) &#123;
+            return res || &#123;};
+          }
+
+          private gererErreur&lt;T>(operation = 'operation', result?: T) &#123;
+            return (erreur: any): Observable&lt;T> => &#123;
+                return of(result as T);
+            };
+          }
+
+          getEtudiants(): Observable&lt;any> &#123;
+            return this.http.get(this.url).pipe(
+              map(this.extraireData)
+            );
+          }
+
+          getEtudiant(id): Observable&lt;any> &#123;
+            return this.http.get(this.url + '/' + id).pipe(
+              map(this.extraireData)
+            );
+          }
+
+          ajouterEtudiant(etudiant): Observable&lt;any> &#123;
+            console.log(etudiant);
+            return this.http.post(this.url, JSON.stringify(etudiant), this.httpOptions).pipe(
+              tap((etu: Etudiant) => console.log(`ajout de l'étudiant id=$&#123;etu.id}`)),
+              catchError(this.gererErreur&lt;any>('ajouterEtudiant'))
+            );
+          }
+
+          modifierEtudiant(id, etudiant): Observable&lt;any> &#123;
+            console.log(etudiant);
+            return this.http.put(this.url + '/' + id, JSON.stringify(etudiant), this.httpOptions).pipe(
+              tap(_ => console.log(`modifier étudiant id=$&#123;id}`)),
+              catchError(this.gererErreur&lt;any>('modifierEtudiant'))
+            );
+          }
+
+          supprimerEtudiant(id): Observable&lt;any> &#123;
+            return this.http.delete(this.url + '/' + id, this.httpOptions).pipe(
+              tap(_ => console.log(`supprimer étudiant id=$&#123;id}`)),
+              catchError(this.gererErreur&lt;any>('supprimerEtudiant'))
+            );
+          }
+        }
+      </pre>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Lister les étudiants</h2>
+
+    <p>
+      Nous allons créer le premier <b>composant</b> de notre projet. Ce dernier nous servira à récupérer
+      et afficher tous les étudiants présents sur le serveur.
+      <br>
+      <i>Dans angular, un <b>composant</b> est une petite partie autonome d'un projet.</i>
+    </p>
+
+    <p>
+      Lancer la commande :
+      <code>ng generate component composant/etudiant-lister</code>
+    </p>
+
+    Votre projet devrait ressembler à ceci :
+    <ul class="dossier">
+      <li>...</li>
+      <li>
+        src
+        <ul>
+          <li>
+            app
+            <ul>
+              <li>
+                composant
+                <ul>
+                  <li>
+                    etudiant-lister
+                    <ul>
+                      <li class="fichier">etudiant-lister.component.css</li>
+                      <li class="fichier">etudiant-lister.component.html</li>
+                      <li class="fichier">etudiant-lister.component.spec.ts</li>
+                      <li class="fichier">etudiant-lister.component.ts</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>modele</li>
+              <li>service</li>
+              <li class="fichier">app.component.css</li>
+              <li class="fichier">app.component.html</li>
+              <li class="fichier">app.component.spec.ts</li>
+              <li class="fichier">app.component.ts</li>
+              <li class="fichier">app.module.ts</li>
+            </ul>
+          </li>
+          <li>assets</li>
+          <li>environnements</li>
+        </ul>
+      </li>
+      <li>...</li>
+    </ul>
+
+    <div>
+      Voici le fichier <b>etudiant-lister.component.ts</b>.
+      <br>
+      <pre>
+        import &#123;Component, OnInit} from '@angular/core';
+        import &#123;Etudiant} from '../../modele/etudiant';
+        import &#123;EtudiantService} from '../../service/etudiant.service';
+        import &#123;ActivatedRoute, Router} from '@angular/router';
+
+        @Component(&#123;
+          selector: 'app-etudiant-lister',
+          templateUrl: './etudiant-lister.component.html',
+          styleUrls: ['./etudiant-lister.component.css']
+        })
+        export class EtudiantListerComponent implements OnInit &#123;
+          etudiants: Etudiant[];
+
+          constructor(public rest: EtudiantService, private route: ActivatedRoute, private router: Router) &#123;
+          }
+
+          ngOnInit() &#123;
+            this.getEtudiants();
+          }
+
+          getEtudiants() &#123;
+            this.etudiants = [];
+            this.rest.getEtudiants().subscribe((data: Etudiant[]) => &#123;
+              console.log(data);
+              this.etudiants = data;
+            });
+          }
+
+          ajouter() &#123;
+            this.router.navigate(['/etudiant-ajouter']);
+          }
+
+          supprimer(id) &#123;
+            this.rest.supprimerEtudiant(id)
+              .subscribe(res => &#123;
+                this.getEtudiants();
+              }, (err) => &#123;
+                console.log(err);
+              }
+            );
+          }
+        }
+      </pre>
+    </div>
+
+    <div>
+      Voici le fichier <b>etudiant-lister.component.html</b>
+      <br>
+      <pre>
+        &lt;h2>Liste des Etudiants&lt;/h2>
+
+        &lt;div>
+          &lt;button (click)="ajouter()" class="btn btn-success">
+            Ajouter un étudiant
+          &lt;/button>
+        &lt;/div>
+        &lt;br>
+
+        &lt;ul class="list-group col-md-6">
+          &lt;li *ngFor="let etu of etudiants; let i = index;" class="list-group-item">
+            &lt;a routerLink="/etudiant-voir/&#123;&#123;etu.id}}">
+              &lt;span class="badge">&#123;&#123;i + 1}}&lt;/span> &#123;&#123;etu.prenom}} &#123;&#123;etu.nom}}
+            &lt;/a>
+
+            &lt;span class="badge btn" (click)="supprimer(etu.id)">
+              &lt;span class="glyphicon glyphicon-trash">&lt;/span>
+            &lt;/span>
+          &lt;/li>
+        &lt;/ul>
+      </pre>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>&Eacute;crire la route</h2>
+
+    <div>
+      Ouvrir le fichier <b>app.module.ts</b>. Et insérer juste après les imports :
+      <br>
+      <pre>
+        const appRoutes: Routes = [
+          &#123;
+            path: 'etudiants',
+            component: EtudiantListerComponent,
+            data: &#123;title: 'Liste des Etudiants'}
+          },
+          &#123;
+            path: '',
+            redirectTo: '/etudiants',
+            pathMatch: 'full'
+          }
+        ];
+      </pre>
+    </div>
+
+    <div>
+      Plus bas dans le fichier, ajouter 2 lignes dans la section <b>imports</b> de <b>@NgModule</b> comme suit :
+      <br>
+      <pre>
+        imports: [
+          BrowserModule,
+          HttpClientModule,
+          RouterModule.forRoot(appRoutes)
+        ],
+      </pre>
+    </div>
+
+    <div>
+      Vos imports tout en haut du fichier devraient ressembler à ceci :
+      <br>
+      <pre>
+        import &#123;BrowserModule} from '@angular/platform-browser';
+        import &#123;NgModule} from '@angular/core';
+
+        import &#123;AppComponent} from './app.component';
+        import &#123;RouterModule, Routes} from '@angular/router';
+        import &#123;EtudiantListerComponent} from './composant/etudiant-lister/etudiant-lister.component';
+        import &#123;HttpClientModule} from '@angular/common/http'
+      </pre>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Petit nettoyage</h2>
+
+    <p>Ouvrir le fichier <b>app.component.html</b> et remplacer son contenu par :
+    <code> &lt;router-outlet>&lt;/router-outlet> </code>
+
+    <p>
+      Vous pouvez maintenant tester l'appli :
+      <b><a href="http://localhost:4200" target="_blank">http://localhost:4200</a></b>
+    </p>
+  </section>
+
+
+  <section>
+    <h2>Ajouter un étudiant</h2>
+
+    <p>
+      Lancer la commande :
+      <code>ng generate component composant/etudiant-ajouter</code>
+    </p>
+
+    Votre projet devrait ressembler à ceci :
+    <ul class="dossier">
+      <li>...</li>
+      <li>
+        src
+        <ul>
+          <li>
+            app
+            <ul>
+              <li>
+                composant
+                <ul>
+                  <li>
+                    etudiant-ajouter
+                    <ul>
+                      <li class="fichier">etudiant-ajouter.component.css</li>
+                      <li class="fichier">etudiant-ajouter.component.html</li>
+                      <li class="fichier">etudiant-ajouter.component.spec.ts</li>
+                      <li class="fichier">etudiant-ajouter.component.ts</li>
+                    </ul>
+                  </li>
+                  <li>etudiant-lister</li>
+                </ul>
+              </li>
+              <li>modele</li>
+              <li>service</li>
+              <li class="fichier">app.component.css</li>
+              <li class="fichier">...</li>
+            </ul>
+          </li>
+          <li>assets</li>
+          <li>environnements</li>
+        </ul>
+      </li>
+      <li>...</li>
+    </ul>
+
+    <div>
+      Voici le fichier <b>etudiant-ajouter.component.ts</b>.
+      <br>
+      <pre>
+        import &#123;Component, Input, OnInit} from '@angular/core';
+        import &#123;EtudiantService} from '../../service/etudiant.service';
+        import &#123;ActivatedRoute, Router} from '@angular/router';
+        import &#123;Etudiant} from '../../modele/etudiant';
+
+        @Component(&#123;
+                selector: 'app-etudiant-ajouter',
+                templateUrl: './etudiant-ajouter.component.html',
+                styleUrls: ['./etudiant-ajouter.component.css']
+        })
+        export class EtudiantAjouterComponent implements OnInit &#123;
+
+          @Input() etudiantForm = &#123;nom: '', prenom: ''};
+
+          constructor(public rest: EtudiantService, private route: ActivatedRoute, private router: Router) &#123;
+          }
+
+          ngOnInit() &#123;
+          }
+
+          ajouterEtudiant() &#123;
+            this.rest.ajouterEtudiant(this.etudiantForm).subscribe((result: Etudiant) => &#123;
+              this.router.navigate(['/etudiant-voir/' + result.id]);
+            }, (err) => &#123;
+              console.log(err);
+            });
+          }
+        }
+      </pre>
+    </div>
+
+    <div>
+      Voici le fichier <b>etudiant-ajouter.component.html</b>.
+      <br>
+      <pre>
+        &lt;div>
+          &lt;h2>Ajouter un étudiant&lt;/h2>
+
+          &lt;form class="form-horizontal">
+            &lt;div class="form-group">
+              &lt;label class="col-sm-2 control-label" for="nom">Nom&lt;/label>
+              &lt;div class="col-sm-10">
+                &lt;input [(ngModel)]="etudiantForm.nom" id="nom" name="nom" placeholder="Dylan">
+              &lt;/div>
+            &lt;/div>
+
+            &lt;div class="form-group">
+              &lt;label class="col-sm-2 control-label" for="prenom">Prénom&lt;/label>
+              &lt;div class="col-sm-10">
+                &lt;input [(ngModel)]="etudiantForm.prenom" id="prenom" name="prenom" placeholder="Bob">
+              &lt;/div>
+            &lt;/div>
+          &lt;/form>
+
+          &lt;div class="form-group">
+            &lt;div class="col-sm-offset-2 col-sm-10">
+              &lt;button (click)="ajouterEtudiant()" class="btn btn-primary">Enregistrer&lt;/button>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      </pre>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Mettre à jour les routes</h2>
+
+    <div>
+      Ouvrir le fichier <b>app.module.ts</b>. Et compléter les routes comme ceci :
+      <pre>
+        const appRoutes: Routes = [
+          {
+            path: 'etudiants',
+            component: EtudiantListerComponent,
+            data: {title: 'Liste des Etudiants'}
+          },
+          {
+            path: 'etudiant-ajouter',
+            component: EtudiantAjouterComponent,
+            data: {title: 'Ajouter Etudiant'}
+          },
+          &#123;
+            path: '',
+            redirectTo: '/etudiants',
+            pathMatch: 'full'
+          }
+        ];
+      </pre>
+    </div>
+
+    <div>
+      <span class="text-danger">Attention, ne pas oublier d'ajouter un import dans le fichier <b>app.module.ts</b></span>
+      <br>
+      <pre>
+        imports: [
+          <span class="text-danger">FormsModule</span>,
+          BrowserModule,
+          HttpClientModule,
+          RouterModule.forRoot(appRoutes)
+        ],
+      </pre>
+    </div>
+
+    <p>Vous pouvez maintenant tester l'appli.</p>
+  </section>
+
+
+  <section>
+    <h2>Consulter et modifier un étudiant</h2>
+
+    <p>
+      &Agrave; vous de jouer. Inspirez-vous de ce qui a été fait précédemment.
+    </p>
+    <p class="text-info">
+      <b>Info</b> : N'oubliez pas les routes.
+    </p>
+  </section>
+</div>
+</body>
+</html>
